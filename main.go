@@ -22,6 +22,7 @@ lint: fmt
 
 vet: fmt
 	go vet ./...
+{{if .shadow}}	shadow ./...{{end}}
 .PHONY:vet
 
 build: vet
