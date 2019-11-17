@@ -62,8 +62,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	err = ioutil.WriteFile(dirName+string(os.PathSeparator)+"main.go", []byte(`
-package main
+	err = ioutil.WriteFile(dirName+string(os.PathSeparator)+"main.go", []byte(`package main
 
 func main() {
 }
