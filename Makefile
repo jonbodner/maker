@@ -2,17 +2,21 @@
 .DEFAULT_GOAL := build
 
 fmt:
-	go fmt ./...
+	@go fmt ./...
 .PHONY:fmt
 
 lint: fmt
-	golint ./...
+	@golint ./...
 .PHONY:lint
 
 vet: fmt
-	go vet ./...
+	@go vet ./...
 .PHONY:vet
 
 build: vet
-	go build
+	@go build
 .PHONY:build
+
+run: build
+	@./$(shell basename $(CURDIR))
+.PHONY:run
