@@ -25,6 +25,7 @@ vet: fmt
 {{- if .shadow}}	@shadow ./...{{end}}
 .PHONY:vet
 
+{{- if not .library}}
 build: vet
 	@go build
 .PHONY:build
@@ -32,6 +33,7 @@ build: vet
 run: vet
 	@go run main.go
 .PHONY:run
+{{end}}
 
 {{- if .test}}
 test: vet
@@ -79,6 +81,8 @@ func main() {
 	mp := flag.Bool("memProfile", false, "Adds Memory profiling to makefile")
 	r := flag.Bool("race", false, "Adds race checking to makefile")
 	tr := flag.Bool("testRace", false, "Adds race checking tests to makefile")
+	l := flag.Bool("library", false, "Creates a library makefile")
+	m := flag.String("mod", "", "Creates a mod file. Specify the source control path (github.com/user/project).")
 
 	flag.Parse()
 
@@ -101,6 +105,7 @@ func main() {
 		"memProfile": *mp,
 		"race":       *r,
 		"testRace":   *tr,
+		"library":    *l,
 	})
 	if err != nil {
 		panic(err)
@@ -113,12 +118,25 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	err = ioutil.WriteFile(dirName+string(os.PathSeparator)+"main.go", []byte(`package main
+	if !(*l) {
+		err = ioutil.WriteFile(dirName+string(os.PathSeparator)+"main.go", []byte(`package main
 
 func main() {
 }
 `), 0744)
+	} else {
+		err = ioutil.WriteFile(dirName+string(os.PathSeparator)+dirName+".go", []byte("package "+dirName+"\n"), 0744)
+	}
 	if err != nil {
 		panic(err)
+	}
+	if *m != "" {
+		err = ioutil.WriteFile(dirName+string(os.PathSeparator)+"go.mod", []byte(fmt.Sprintf(`module %s
+
+go 1.13
+`, *m)), 0744)
+		if err != nil {
+			panic(err)
+		}
 	}
 }
