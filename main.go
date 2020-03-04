@@ -37,11 +37,27 @@ run: vet
 
 {{- if .test}}
 test: vet
-	@go test {{if .bench}}-bench=. -benchmem{{end}} {{if .cover}}-cover{{end}} {{if .coverHTML}}-coverprofile=c.out{{end}} ./...
-	{{- if .coverHTML}}
-	@go tool cover -html=c.out
-	{{end}}
+	@go test -v ./...
 .PHONY:test
+{{ end }}
+
+{{- if .bench}}
+bench: vet
+	@go test -v -bench=. -benchmem ./...
+.PHONY:bench
+{{ end }}
+
+{{- if and .test .cover}}
+test-cover: vet
+	@go test -v -cover ./...
+.PHONY:test-cover
+{{ end }}
+
+{{- if and .test .coverHTML}}
+test-cover-html: vet
+	@go test -v -cover -coverprofile=c.out ./...
+	@go tool cover -html=c.out
+.PHONY:test-cover-html
 {{ end }}
 
 {{- if .testRace}}
@@ -133,7 +149,7 @@ func main() {
 	if *m != "" {
 		err = ioutil.WriteFile(dirName+string(os.PathSeparator)+"go.mod", []byte(fmt.Sprintf(`module %s
 
-go 1.13
+go 1.14
 `, *m)), 0744)
 		if err != nil {
 			panic(err)
