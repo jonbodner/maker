@@ -25,7 +25,7 @@ vet: fmt
 {{- if .shadow}}	@shadow ./...{{end}}
 .PHONY:vet
 
-{{- if not .library}}
+{{ if not .library}}
 build: vet
 	@go build
 .PHONY:build
@@ -33,6 +33,10 @@ build: vet
 run: vet
 	@go run main.go
 .PHONY:run
+{{ else}}
+build: vet
+	@go build ./...
+.PHONY:build
 {{end}}
 
 {{- if .test}}
